@@ -1,0 +1,21 @@
+@charset "UTF-8";
+
+.bg-main-background {
+  background-color: rgba(56, 57, 62, 1);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.bg-opacity {
+  background-color: rgba(200, 200, 200, 0.3);
+}
+
+.bg-opacity-white {
+  background-color: rgba(245, 245, 245, 0.3);
+}
+
+.banner-img {
+  max-width: 1000px;
+  max-height: 563px;
+  object-fit: scale-down;
+}

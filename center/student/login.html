@@ -1,0 +1,90 @@
+<?php
+include_once $_SERVER['DOCUMENT_ROOT'] . "/_config/session_start.php";
+$engName = explode('/', $_SERVER['REQUEST_URI']);
+include_once $_SERVER['DOCUMENT_ROOT'] . "/common/dbClass.php";
+$db = new DBCmp();
+include_once $_SERVER['DOCUMENT_ROOT'] . "/common/commonClass.php";
+$infoClassCmp = new infoClassCmp();
+$engName = explode('/', $_SERVER['REQUEST_URI']);
+
+$center_idx = $infoClassCmp->getFranchiseeInfo($engName[1]);
+?>
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>리딩엠 RAMS - 로그인</title>
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon" />
+    <!-- css -->
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.2/css/bootstrap.min.css" integrity="sha512-CpIKUSyh9QX2+zSdfGP+eWLx23C8Dj9/XmHjZY2uDtfkdLGo0uY12jgcnkX9vXOgYajEKb/jiw67EYm+kBf+6g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- script -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.2/js/bootstrap.bundle.min.js" integrity="sha512-BOsvKbLb0dB1IVplOL9ptU1EYA+LuCKEluZWRUYG73hxqNBU85JBIBhPGwhQl7O633KtkjMv8lvxZcWP+N3V3w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/js/all.min.js" integrity="sha512-naukR7I+Nk6gp7p5TMA4ycgfxaZBJ7MO5iC3Fp6ySQyKFHOGfpkSZkYVWV5R7u7cfAicxanwYQ5D1e17EfJcMA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="/center/student/js/login.js?v=<?=date("YmdHis")?>"></script>
+</head>
+<script>
+    var center_idx = '<?=$center_idx?>';
+    var center_name = '<?= $engName[1] ?>';
+</script>
+<body class="bg-dark">
+    <div id="layoutAuthentication">
+        <div id="layoutAuthentication_content">
+            <main>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-5">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                <div class="card-header">
+                                    <h3 class="text-center font-weight-light my-4"><img class="img rounded-circle" src="/img/logo.png" /><span id="headTxt" class="align-middle ms-2">로그인</span></h3>
+                                </div>
+                                <div class="card-body">
+                                    <form id="loginForm">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="inputId" type="text" placeholder="아이디" maxlength="20"/>
+                                            <label for="inputId">아이디</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" id="inputPassword" type="password" placeholder="비밀번호" maxlength="20"/>
+                                            <label for="inputPassword">비밀번호</label>
+                                        </div>
+                                        <div id="div_captcha" <?= isset($_SESSION['captcha']) ? '' : 'class="d-none"' ?>>
+                                            <?php
+                                            if (isset($_SESSION['captcha'])) {
+                                                include_once $_SERVER['DOCUMENT_ROOT'] . "/captcha/index.php";
+                                                $captcha = getCaptcha();
+                                                echo $captcha;
+                                            }
+                                            ?>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                                            <a class="small" href="password.html">아이디 &#47; 비밀번호 찾기</a>
+                                            <a class="btn btn-primary" href="javascript:void(0)" onclick="login_check()"><i class="fa-solid fa-right-to-bracket"></i> 로그인</a>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="card-footer text-center py-3">
+                                    <div class="small"><a class="btn- btn-outline-primary" href="register.html">회원가입</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <!-- footer -->
+        <?php
+        include_once('footer_auth.php');
+        ?>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,161 @@
+<?php
+include_once $_SERVER['DOCUMENT_ROOT'] . "/common/dbClass.php";
+$db = new DBCmp();
+
+include_once $_SERVER['DOCUMENT_ROOT'] . "/adm/Controller/BookController.php";
+
+$bookController = new bookController();
+
+$category1 = $bookController->bookCategory('1');
+?>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <?php
+    $stat = "adm";
+    include_once $_SERVER['DOCUMENT_ROOT'] . "/common/common_script.php";
+    ?>
+    <script src="/adm/js/book.js?v=<?= date('YmdHis') ?>"></script>
+</head>
+
+<body class="sb-nav-fixed size-14">
+    <!-- header navbar -->
+    <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/adm/navbar.html'; ?>
+    <div id="layoutSidenav">
+        <!-- sidebar -->
+        <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/adm/sidebar.html'; ?>
+
+        <div id="Maincontent">
+            <main>
+                <div class="container-fluid px-4 mt-3">
+                    <!-- 콘텐츠 -->
+                    <div class="card border-left-primary shadow h-100">
+                        <div class="card-body">
+                            <h6>도서목록</h6>
+                            <div class="input-group justify-content-end">
+                                <div class="form-inline me-1">
+                                    <div class="form-floating">
+                                        <select id="selSearchingType" class="form-select">
+                                            <option value="1">제목</option>
+                                            <option value="0">ISBN</option>
+                                            <option value="3">저자</option>
+                                            <option value="2">출판사</option>
+                                            <option value="4">카테고리</option>
+                                        </select>
+                                        <label for="selSearchingType">검색종류</label>
+                                    </div>
+                                </div>
+                                <div class="form-inline w-35">
+                                    <div class="form-floating">
+                                        <input type="text" id="searchValue" class="form-control" title="검색어 입력 후 엔터를 눌러주세요." />
+                                        <label for="searchValue">검색</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <table class="table table-bordered table-hover" id="dataTable">
+                                <thead class="text-center">
+                                    <th>ISBN</th>
+                                    <th>도서명</th>
+                                    <th>출판사</th>
+                                    <th>저자</th>
+                                    <th>카테고리</th>
+                                    <th>등록일</th>
+                                </thead>
+                                <tbody class="text-center">
+                                </tbody>
+                            </table>
+
+                            <div class="text-end mt-2">
+                                <button id="btnAdd" class="btn btn-success"><i class="fa-solid fa-plus me-1"></i>추가</button>
+                            </div>
+
+                            <table class="table table-bordered table-hover mt-4">
+                                <thead class="text-center">
+                                    <th colspan="16">도서 분류</th>
+                                </thead>
+                                <tbody class="text-center" id="bookCategoryTable">
+                                </tbody>
+                            </table>
+                            <div class="modal fade" id="BookModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="ModalLabel">도서 정보</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="bookForm">
+                                                <input type="hidden" id="book_id">
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr class="align-middle">
+                                                            <th class="text-center" scope="row" colspan="3">도서명</th>
+                                                            <td colspan="9"><input type="text" class="form-control" id="book_name" name="txtBookName" maxlength="100" /></td>
+                                                        </tr>
+                                                        <tr class="align-middle">
+                                                            <th class="text-center" scope="row" colspan="3">ISBN</th>
+                                                            <td colspan="9"><input type="text" class="form-control" id="book_isbn" name="txtBookISBN" maxlength="13" /></td>
+                                                        </tr>
+                                                        <tr class="align-middle">
+                                                            <th class="text-center" scope="row" colspan="3">저자</th>
+                                                            <td colspan="3">
+                                                                <input list="writerList" type="text" id="book_writer" class="form-control" name="txtWriter" maxlength="30" placeholder="저자" />
+                                                                <datalist id="writerList"></datalist>
+                                                            </td>
+                                                            <th class="text-center" colspan="3">출판사</th>
+                                                            <td colspan="3">
+                                                                <input list="publisherList" type="text" id="book_publisher" class="form-control" name="txtPublisher" maxlength="30" placeholder="출판사" />
+                                                                <datalist id="publisherList"></datalist>
+                                                            </td>
+                                                        </tr>
+                                                        <tr class="align-middle">
+                                                            <th class="text-center" scope="row" colspan="3">카테고리</th>
+                                                            <th class="text-center">1차</th>
+                                                            <td colspan="2">
+                                                                <select class="form-select" id="category1" onchange="bookCategoryChange(this.value, '2')">
+                                                                    <option value="">선택</option>
+                                                                    <?php
+                                                                    if (!empty($category1)) {
+                                                                        foreach ($category1 as $key => $val) {
+                                                                            echo "<option value=\"" . $val['code_num1'] . "\">" . $val['code_name'] . "</option>";
+                                                                        }
+                                                                    }
+                                                                    ?>
+                                                                </select>
+                                                            </td>
+                                                            <th class="text-center">2차</th>
+                                                            <td colspan="2">
+                                                                <select class="form-select" id="category2" onchange="bookCategoryChange(this.value, '3')">
+                                                                    <option value="">선택</option>
+                                                                </select>
+                                                            </td>
+                                                            <th class="text-center">3차</th>
+                                                            <td colspan="2">
+                                                                <select class="form-select" id="category3">
+                                                                    <option value="">선택</option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-1"></i>닫기</button>
+                                            <button type="button" class="btn btn-primary" onclick="bookFormData()"><i class="fa-solid fa-floppy-disk me-1"></i>저장</button>
+                                            <button type="button" class="btn btn-danger" id="btnBookDelete" style="display: none;"><i class="fas fa-trash me-1"></i>삭제</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <?php include $_SERVER['DOCUMENT_ROOT'] . "/adm/footer.html" ?>
+        </div>
+    </div>
+</body>
+
+</html>

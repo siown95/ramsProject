@@ -1,0 +1,35 @@
+<?php
+$user_id = !empty($_a['user_id']) ? $_a['user_id'] : '';
+$password = !empty($_a['password']) ? $_a['password'] : '';
+?>
+<div style="background-color: #FCFCFC;">
+    <!-- <img src="/img/maillogo.jpg"> -->
+    <img src="https://www.readingm.com/image/main_visual01.jpg">
+    <p>안녕하세요. 책읽기와 글쓰기 리딩엠입니다.</p>
+    <p>요청하신 <u>계정 정보</u>는 아래와 같습니다.</p>
+    <br>
+    <hr>
+    <br>
+    <ul style="line-height: 1.5;">
+        <li>사이트 주소 : <a href="<?= $_SERVER['SERVER_NAME'] ?>" rel="noopener noreferrer" target="_blank"><?= $_SERVER['SERVER_NAME'] ?></a></li>
+        <li>아이디 :&nbsp;
+            <?= $user_id ?>
+        </li>
+        <?php if (!empty($password)) { ?>
+            <li>비밀번호 : <span style="font-size: 14pt; color: rgba(255, 0, 0, 0.75);">12345678</span></li>
+        <?php } ?>
+    </ul>
+    <br>
+    <hr>
+    <br>
+    <table style="font-size:10pt; background-color: #e6e6e6; text-align: center; width: 100%;">
+        <tbody>
+            <tr>
+                <td>본 이메일은 <b>발송전용</b>으로 회신되지 않습니다&#46; 궁금한 사항은 리딩엠 본사 <a href="tel:02-537-2248" rel="noopener noreferrer" target="_blank">&#45;537&#45;2248</a> 또는 각 교육센터 연락처로 문의바랍니다&#46;</td>
+            </tr>
+            <tr>
+                <td>&copy;책읽기와 글쓰기 리딩엠&$44; All rights reserved&#46;</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

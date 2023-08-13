@@ -1,0 +1,151 @@
+<?php
+if (empty($_POST['code'])) {
+    header("Location : /index.php");
+}
+require_once $_SERVER['DOCUMENT_ROOT'] . "/common/dbClass.php";
+$db = new DBCmp();
+include_once $_SERVER['DOCUMENT_ROOT'] . '/common/commonClass.php';
+$codeInfoCmp = new codeInfoCmp();
+$infoClassCmp = new infoClassCmp();
+
+$locationSelect = $codeInfoCmp->getCodeInfo('01'); //지역
+?>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>리딩엠 RAMS - 계정 생성</title>
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon" />
+    <!-- css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" integrity="sha512-GQGU0fMMi238uA+a/bdWJfpUGKUkBdgfFdgBm72SUQ6BeyWjoY/ton0tEjH+OSH9iP4Dfh+7HM0I9f5eR0L/4w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="/css/styles.css?v=<?= date("YmdHis") ?>" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/js/all.min.js" integrity="sha512-naukR7I+Nk6gp7p5TMA4ycgfxaZBJ7MO5iC3Fp6ySQyKFHOGfpkSZkYVWV5R7u7cfAicxanwYQ5D1e17EfJcMA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js" integrity="sha512-pax4MlgXjHEPfCwcJLQhigY7+N8rt6bVvWLFyUMuxShv170X53TRzGPmPkZmGBhk+jikR8WBM4yl7A9WMHHqvg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+    <script src="js/register.js?v=<?= date('YmdHis') ?>"></script>
+</head>
+
+<body class="bg-dark size-14">
+    <div id="layoutAuthentication">
+        <div id="layoutAuthentication_content">
+            <main>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-7">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                <div class="card-header">
+                                    <h3 class="text-center font-weight-light my-4"><img class="img rounded-circle" src="/img/logo.png" /><span id="headTxt" class="align-middle ms-2">가맹 등록</span></h3>
+                                </div>
+
+                                <div id="checkDiv" class="card-body">
+                                    <?php
+                                    include_once $_SERVER['DOCUMENT_ROOT'] . '/adm/privacy.html';
+                                    ?>
+                                    <div class="container text-center">
+                                        <div class="form-check mt-2 mb-2">
+                                            <input type="checkbox" id="chkPrivacy" class="form-check-input" />
+                                            <label class="form-check-label" for="chkPrivacy">위 내용을 모두 확인하였고, 이용약관 및 개인정보 수집 및 이용에 대해 동의합니다.</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="inputDiv" class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-2">
+                                            <div class="form-floating mb-3 mb-md-0">
+                                                <select id="selCenterType" class="form-select">
+                                                    <option value="02">가맹점</option>
+                                                    <option value="03">솔루션임대</option>
+                                                </select>
+                                                <label for="selCenterType">가맹구분</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-floating mb-3 mb-md-0">
+                                                <select id="selLocation" class="form-select">
+                                                    <?php
+                                                    if (!empty($locationSelect)) {
+                                                        foreach ($locationSelect as $key => $val) {
+                                                            echo "<option value=" . $val['code_num2'] . ">" . $val['code_name'] . "</option>";
+                                                        }
+                                                    }
+                                                    ?>
+                                                </select>
+                                                <label for="selLocation">지역</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="form-floating mb-3 mb-md-0">
+                                                <input class="form-control" id="txtCenterName" type="text" placeholder="교육센터 명" maxlength="20" />
+                                                <label for="txtCenterName">교육센터 명</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3 mb-md-0">
+                                                <input class="form-control" id="txtName" type="text" placeholder="대표자 이름" maxlength="10" />
+                                                <label for="txtName">대표자 이름</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" id="txtEmail" type="email" placeholder="이메일" maxlength="50" />
+                                        <label for="txtEmail">이메일</label>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3 mb-md-0">
+                                                <input class="form-control" id="txtHp" type="text" placeholder="전화번호" maxlength="11" />
+                                                <label for="txtHp">전화번호</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating mb-3 mb-md-0">
+                                                <input class="form-control" id="txtFax" type="text" placeholder="FAX" maxlength="13" />
+                                                <label for="txtFax">FAX</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-10">
+                                            <div class="form-floating mb-3 mb-md-0">
+                                                <input class="form-control" id="txtAddr" type="text" placeholder="주소" maxlength="100" />
+                                                <label for="txtAddr">주소</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 align-self-center">
+                                            <div class="form-floating mb-3 mb-md-0">
+                                                <button type="button" id="btnaddr" class="btn btn-outline-success">주소찾기</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 mb-0">
+                                        <div class="d-grid"><button type="button" id="btnSave" class="btn btn-primary btn-block">가맹점 생성 요청</button></div>
+                                    </div>
+                                </div>
+
+                                <div class="card-footer text-center py-3">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <!-- footer -->
+        <?php
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/adm/footer_auth.html';
+        ?>
+    </div>
+</body>
+
+</html>

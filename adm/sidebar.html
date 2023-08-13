@@ -1,0 +1,156 @@
+<?php
+$permissionCmp = new permissionCmp();
+$menuClassCmp = new menuClassCmp();
+if (!empty($_SESSION['logged_no_adm'])) {
+    $myMenu = $permissionCmp->myMenuList($_SESSION['logged_no_adm'], 'adm');
+    $myMenuList = explode(",", $myMenu);
+    $menuList = $menuClassCmp->getMenu('adm');
+
+    $printMenu = array(); // 권한있는 메뉴리스트
+
+    foreach ($menuList as $menuKey => $menu) {
+        if (in_array($menu['menu_idx'], $myMenuList)) {
+            $printMenu[$menu['menu_idx']] = $menu;
+        }
+    }
+}
+?>
+<div id="layoutSidenav_nav">
+    <!-- 사이드바 메뉴 -->
+    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+            <div class="nav">
+                <hr>
+                <a class="nav-link" href="/adm/">
+                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    대시보드
+                </a>
+                <hr>
+                <a class="nav-link collapse" href="#" data-bs-toggle="collapse" data-bs-target="#collapseManage" aria-expanded="true" aria-controls="collapseManage">
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-gear"></i></div>
+                    관리
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse show" id="collapseManage" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <?php
+                        //관리 메뉴 배열
+                        $manage_arr1 = array(1, 2, 18);  //코드관리, 주차관리, 수납항목관리
+                        $manage_arr2 = array(3, 4, 5, 6, 7, 17);  //교육센터관리, 원생현황, 매출현황, 매출확정, 포인트, 환불내역
+                        $manage_arr3 = array(8, 9, 10, 11);  //직원관리, 결재관리, 출근부확인, 직원교육
+                        $manage_arr4 = array(12, 13, 19);  //도서관리, 커리큘럼관리, 요청도서관리
+                        $manage_arr5 = array(14, 16);  //물품관리, 물품주문정보
+
+                        foreach ($printMenu as $printKey => $printList) {
+                            if (in_array($printKey, $manage_arr1)) {
+                                echo "<a class='nav-link' href='" . $printList['link'] . "'>" . $printList['menu_name'] . "</a>";
+                            }
+                        }
+                        ?>
+                        <a class="nav-link" href="/adm/banner.php">배너관리</a>
+                        <a class="nav-link" href="/adm/businessreport.html">업무보고</a>
+                    </nav>
+                    <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordion1">
+                        <a class="nav-link collapse" href="#" data-bs-toggle="collapse" data-bs-target="#franchiseeManage" aria-expanded="true" aria-controls="franchiseeManage">
+                            교육센터
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse show" id="franchiseeManage" data-bs-parent="#sidenavAccordion1">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <?php
+                                foreach ($printMenu as $printKey => $printList) {
+                                    if (in_array($printKey, $manage_arr2)) {
+                                        echo "<a class='nav-link' href='" . $printList['link'] . "'>" . $printList['menu_name'] . "</a>";
+                                    }
+                                }
+                                ?>
+                            </nav>
+                        </div>
+                    </nav>
+                    <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordion2">
+                        <a class="nav-link collapse" href="#" data-bs-toggle="collapse" data-bs-target="#personnelAdministration" aria-expanded="true" aria-controls="personnelAdministration">
+                            인사행정
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse show" id="personnelAdministration" data-bs-parent="#sidenavAccordion2">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <?php
+                                foreach ($printMenu as $printKey => $printList) {
+                                    if (in_array($printKey, $manage_arr3)) {
+                                        echo "<a class='nav-link' href='" . $printList['link'] . "'>" . $printList['menu_name'] . "</a>";
+                                    }
+                                }
+                                ?>
+                            </nav>
+                        </div>
+                    </nav>
+                    <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordion3">
+                        <a class="nav-link collapse" href="#" data-bs-toggle="collapse" data-bs-target="#bookInfoAdmin" aria-expanded="true" aria-controls="bookInfoAdmin">
+                            도서정보
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse show" id="bookInfoAdmin" data-bs-parent="#sidenavAccordion3">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <?php
+                                foreach ($printMenu as $printKey => $printList) {
+                                    if (in_array($printKey, $manage_arr4)) {
+                                        echo "<a class='nav-link' href='" . $printList['link'] . "'>" . $printList['menu_name'] . "</a>";
+                                    }
+                                }
+                                ?>
+                            </nav>
+                        </div>
+                    </nav>
+                    <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordion4">
+                        <a class="nav-link collapse" href="#" data-bs-toggle="collapse" data-bs-target="#orderInfo" aria-expanded="true" aria-controls="orderInfo">
+                            주문정보
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse show" id="orderInfo" data-bs-parent="#sidenavAccordion4">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <?php
+                                foreach ($printMenu as $printKey => $printList) {
+                                    if (in_array($printKey, $manage_arr5)) {
+                                        echo "<a class='nav-link' href='" . $printList['link'] . "'>" . $printList['menu_name'] . "</a>";
+                                    }
+                                }
+                                ?>
+                            </nav>
+                        </div>
+                    </nav>
+                </div>
+                <a class="nav-link collapse" href="#" data-bs-toggle="collapse" data-bs-target="#collapseCustomerServices" aria-expanded="true" aria-controls="collapseCustomerServices">
+                    <div class="sb-nav-link-icon"><i class="fa-regular fa-face-smile"></i></div>
+                    고객지원
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse show" id="collapseCustomerServices" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" href="/adm/board_list.html">공지사항</a>
+                        <a class="nav-link" href="/adm/fileboard_list.html">자료실</a>
+                        <a class="nav-link" href="/adm/inquiry_request.html">문의및요청사항</a>
+                        <a class="nav-link" href="/adm/activity_error_report.php">활동지오류신고</a>
+                        <a class="nav-link" href="/adm/magazine.html">M매거진</a>
+                        <a class="nav-link" href="/adm/magazine_produce.php">M매거진 원고제출</a>
+                        <a class="nav-link" href="/adm/board_lessontip_list.html">수업 TIP</a>
+                    </nav>
+                </div>
+                <a class="nav-link collapse" href="#" data-bs-toggle="collapse" data-bs-target="#collapseCurriculum" aria-expanded="true" aria-controls="collapseCurriculum">
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    교육과정
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse show" id="collapseCurriculum" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" href="/adm/activitypaper.html">활동지</a>
+                    </nav>
+                </div>
+                <hr>
+                <a class="nav-link" href="/adm/monitoring.php">
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-server"></i></div>
+                    모니터링
+                </a>
+            </div>
+        </div>
+    </nav>
+</div>

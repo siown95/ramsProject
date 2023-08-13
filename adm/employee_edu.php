@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>리딩엠 RAMS - 직원교육</title>
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
+    <?php
+    $stat = "adm";
+    include_once $_SERVER['DOCUMENT_ROOT'] . "/common/common_script.php";
+    ?>
+    <script src="/adm/js/employee_edu.js?v=<?= date("YmdHis") ?>"></script>
+</head>
+
+<body class="sb-nav-fixed size-14">
+    <!-- header navbar -->
+    <?php include_once('navbar.html'); ?>
+    <div id="layoutSidenav">
+        <!-- sidebar -->
+        <?php include_once('sidebar.html'); ?>
+
+        <div id="Maincontent">
+            <main>
+                <div class="container-fluid px-4">
+                    <!-- 콘텐츠 -->
+                    <div class="row mt-3">
+                        <div class="col-4 mb-2">
+                            <div class="card border-left-primary shadow h-100">
+                                <div class="card-body">
+                                    <div class="container">
+                                        <h6>교육계획 설정</h6>
+                                        <div class="input-group justify-content-end mb-2">
+                                            <button type="button" id="btnClear1" class="btn btn-sm btn-secondary mr-1"><span class="icon mr-1"><i class="fas fa-redo"></i></span>초기화</button>
+                                            <button type="button" id="btnDelete1" class="btn btn-sm btn-danger mr-1 d-none"><span class="icon mr-1"><i class="fas fa-trash"></i></span>삭제</button>
+                                            <button type="button" id="btnSave1" class="btn btn-sm btn-primary"><span class="icon mr-1"><i class="fas fa-save"></i></span>저장</button>
+                                        </div>
+                                        <form id="eduInfoForm" class="mb-2">
+                                            <input type="hidden" id="eduInfoidx" value="">
+                                            <div class="input-group mb-1">
+                                                <label class="form-label">교육명</label>
+                                            </div>
+                                            <div class="input-group mb-1">
+                                                <input type="text" class="form-control" id="txtEduName" />
+                                            </div>
+                                            <div class="input-group mb-1">
+                                                <label class="form-label">교육분류</label>
+                                            </div>
+                                            <div class="input-group mb-1">
+                                                <select class="form-select" id="selEduType">
+                                                    <option value="1">법정의무교육</option>
+                                                    <option value="2">사내직무교육</option>
+                                                </select>
+                                            </div>
+                                            <div class="input-group mb-1">
+                                                <label class="form-label">대상</label>
+                                            </div>
+                                            <div class="input-group mb-1">
+                                                <input type="text" class="form-control" id="txtEduTarget" />
+                                            </div>
+                                            <div class="input-group mb-1">
+                                                <label class="form-label">방법</label>
+                                            </div>
+                                            <div class="input-group mb-1">
+                                                <textarea class="form-control" rows="4" id="txtEduWay"></textarea>
+                                            </div>
+                                        </form>
+                                        <h6>계획목록</h6>
+                                        <table class="table table-sm table-bordered table-hover">
+                                            <thead class="align-middle text-center small">
+                                                <th>교육명</th>
+                                                <th>교육분류</th>
+                                            </thead>
+                                            <tbody class="align-middle text-center small" id="eduList">
+                                                <?php
+                                                $infoClassCmp = new infoClassCmp();
+                                                $eduInfoarr = $infoClassCmp->searchEduInfo();
+                                                if (!empty($eduInfoarr)) {
+                                                    foreach ($eduInfoarr as $key => $val) {
+                                                        echo "<tr class=\"educ\" data-edu-idx=\"" . $val['edu_idx'] . "\">
+                                                                <td>" . $val['edu_name'] . "</td>
+                                                                <td>" . $val['edu_type'] . "</td>
+                                                            </tr>";
+                                                    }
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-5 mb-2">
+                            <div class="card border-left-primary shadow h-100">
+                                <div class="card-body">
+                                    <div class="container">
+                                        <h6>교육일정 설정</h6>
+                                        <div class="input-group justify-content-end mb-2">
+                                            <button type="button" id="btnClear2" class="btn btn-sm btn-secondary mr-1"><span class="icon mr-1"><i class="fas fa-redo"></i></span>초기화</button>
+                                            <button type="button" id="btnDelete2" class="btn btn-sm btn-danger mr-1 d-none"><span class="icon mr-1"><i class="fas fa-trash"></i></span>삭제</button>
+                                            <button type="button" id="btnSave2" class="btn btn-sm btn-primary"><span class="icon mr-1"><i class="fas fa-save"></i></span>저장</button>
+                                        </div>
+                                        <form id="eduScheduleForm">
+                                            <input type="hidden" id="eduscheduleIdx">
+                                            <div class="form-floating">
+                                                <select id="selCenter2" class="form-select" onchange="eduCenterSelect(this.value); eduCenterScheduleSelect(this.value);">
+                                                    <option value="">선택</option>
+                                                    <?php
+                                                    $franchisee_option = $infoClassCmp->searchFranchisee();
+                                                    if (!empty($franchisee_option)) {
+                                                        foreach ($franchisee_option as $key => $val) {
+                                                            echo "<option value=\"" . $val['franchise_idx'] . "\">" . $val['center_name'] . "</option>";
+                                                        }
+                                                    }
+                                                    ?>
+                                                </select>
+                                                <label for="selCenter">센터</label>
+                                            </div>
+                                            <div class="input-group mb-2">
+                                                <label class="form-label">교육명</label>
+                                            </div>
+                                            <div class="input-group mb-2">
+                                                <select class="form-select" id="selEduInfo">
+                                                    <option value="">선택</option>
+                                                    <?php
+                                                    if (!empty($eduInfoarr)) {
+                                                        foreach ($eduInfoarr as $key => $val) {
+                                                            echo "<option value=\"" . $val['edu_idx'] . "\">" . $val['edu_name'] . "</option>";
+                                                        }
+                                                    }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                            <div class="input-group mb-2">
+                                                <div class="form-floating me-2">
+                                                    <input type="date" class="form-control" id="dtEdufromDate" placeholder="실시기간(시작)" />
+                                                    <label for="dtEdufromDate">실시기간(시작)</label>
+                                                </div>
+                                                <div class="form-floating">
+                                                    <input type="date" class="form-control" id="dtEdutoDate" placeholder="실시기간(끝)" disabled />
+                                                    <label for="dtEdutoDate">실시기간(끝)</label>
+                                                </div>
+                                            </div>
+                                            <table class="table table-bordered">
+                                                <thead class="align-middle text-center">
+                                                    <th><input type="checkbox" id="chkAllCheck" class="form-check-input" /></th>
+                                                    <th>이름</th>
+                                                </thead>
+                                                <tbody id="eduEmployeeMember">
+                                                </tbody>
+                                            </table>
+                                        </form>
+                                        <h6>교육목록</h6>
+
+                                        <table class="table table-sm table-bordered table-hover">
+                                            <thead class="align-middle text-center small">
+                                                <th>교육명</th>
+                                                <th>교육종류</th>
+                                                <th>실시기간</th>
+                                                <th>대상인원</th>
+                                                <th>이수인원</th>
+                                            </thead>
+                                            <tbody class="align-middle text-center small" id="eduScheduleList">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 교육 세부 -->
+                        <div class="col-3">
+                            <div class="card border-left-primary shadow h-100">
+                                <div class="card-body">
+                                    <h6>교육세부</h6>
+                                    <table class="table table-sm table-bordered table-hover">
+                                        <thead class="align-middle text-center small">
+                                            <th>번호</th>
+                                            <th>이름</th>
+                                            <th>이수일자</th>
+                                            <th>수료증</th>
+                                        </thead>
+                                        <tbody class="align-middle text-center small" id="eduEmployeeList">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </main>
+            <!-- footer -->
+            <?php
+            include_once('footer.html');
+            ?>
+        </div>
+    </div>
+</body>
+
+</html>

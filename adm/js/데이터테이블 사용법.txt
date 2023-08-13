@@ -1,0 +1,122 @@
+기본 형식
+$("#테이블아이디").DataTable();
+
+기능 설정
+$("#테이블아이디").DataTable({
+	// 항목 위치 설정
+	// l : LengthChange / f : filtering / t : table / i : infomation summary / p : pagination / r : processing display element(검색)
+	"dom": "옵션 순서",
+	"dom": "lfrtip", // 기본순서
+	"dom": "iptfl", // 특정순서 지정
+	// 항목별 스타일 설정 - 미리 지정된 스타일 클래스
+	"dom": "옵션 순서",
+	"dom": '<"col-sm-6"i><"col-sm-6"p>t<"col-sm-6"f><"col-sm-6"l>',
+	// 표시 건수기능 숨기기
+	lengthChange: false,
+	// 표시 건수 단위 설정
+	lengthMenu: [ 10, 20, 30, 40, 50 ],
+	// 기본 표시 건수 설정
+	displayLength: 10, 
+	// 검색 기능 숨기기
+	searching: false,
+	// 정렬 기능 숨기기
+	ordering: false,
+	// 정보 표시 숨기기
+	info: false,
+	// 페이징 기능 숨기기
+	paging: false
+});
+언어설정
+// 기본형
+	"decimal":        "", // 소수 표시
+	"emptyTable":     "No data available in table", // 테이블 결과 없을 때
+	"info":           "Showing _START_ to _END_ of _TOTAL_ entries", // 데이터 갯수 표시 - 표시된 데이터 X ~ X 전체 X 건
+	"infoEmpty":      "Showing 0 to 0 of 0 entries", // 데이터 없을 때
+	"infoFiltered":   "(filtered from _MAX_ total entries)", // 검색된 조회 결과
+	"infoPostFix":    "",
+	"thousands":      ",", // 1000 단위 콤마 표시
+	"lengthMenu":     "Show _MENU_ entries", // 표시 갯수 설정
+	"loadingRecords": "Loading...", // 데이터 로딩 시 표시
+	"processing":     "",
+	"search": "Search:", // 검색창 문구
+	"zeroRecords": "No matching records found", // 검색 결과 없을 때
+	"paginate": {
+		"first": "First", // 페이지 처음으로
+		"last": "Last", // 페이지 마지막으로
+		"next": "Next", // 다음 페이지
+		"previous": "Previous" // 이전 페이지
+	},
+	"aria": {
+		"sortAscending":  ": activate to sort column ascending", // 오름차순 정렬 툴팁
+		"sortDescending": ": activate to sort column descending" // 내림차순 정렬 툴팁
+	}
+}
+// 특정 형태 지정
+	language: {
+		emptyTable: '데이터가 없습니다.',
+		infoEmpty: '',
+		info: ' _TOTAL_ 개의 데이터가 있습니다.',
+		search: '<span>검색 :</span> _INPUT_',
+		searchPlaceholder: '내용 입력...',
+		lengthMenu: 'Display _MENU_',
+		paginate: {
+			first: 'First',
+			last: 'Last',
+			next: $('html').attr('dir') == 'rtl' ? '&larr;' : '&rarr;',
+			previous: $('html').attr('dir') == 'rtl' ? '&rarr;' : '&larr;',
+    },
+  },
+
+
+초기 출력시 테이블 정렬
+$("#테이블아이디").DataTable({
+	// order : [ [ 열 번호, 정렬 순서 ], ... ] 예시 - order:[ [ 0, "asc" ], [ 1, "desc"] ]
+	// 열번호는 0부터 시작 오름차순 : asc / 내림차순 : desc
+	order: [ [ 1, "asc" ] ]
+});
+
+스크롤바 & 열 설정
+$("#foo-table").DataTable({
+	// 스크롤바
+	// 가로 스크롤바 표시 설정 값은 true 또는 false
+	scrollX: true,
+	// 세로 스크롤바 표시 설정은 int값 단위는 px
+	scrollY: 200,
+
+	// 열 설정
+	columnDefs: [
+		// 1번재 항목 열을 숨김
+		{ targets: 0, visible: false },
+
+		// 넓이 설정
+		{ targets: 1, width: 100 },
+
+		// targets 설정 방법
+		// 단일일 때 - 숫자
+		{ targets: 2, width: 100  },
+
+		// 배열일 떄 - 배열사용
+		{ targets: [0, 1, 2], width: 100  },
+	
+		// 특정 클래스만 적용할 떄 - 문자열
+		{ targets: "클래스이름", width: 100  },
+
+		// 금액일 때 3자리 콤마 설정
+		{ targets: 2, render: $.fn.dataTable.render.number( ',' ) },
+		// 금액일 때 3자리 콤마 + 원 표시 설정
+		{ targets: 3 , render: $.fn.dataTable.render.number( ',' , '.' , 0 , '' , '원' ) },
+	]
+});
+
+Ajax 데이터 바인딩
+$("#테이블아이디").DataTable({
+	ajax: { url: "타겟 파일 / 링크", dataSrc: '' },
+		columns: [
+			{ data: "id" },
+			{ data: "name" }
+		]
+});
+데이터 테이블 생성 완료 후 처리 함수
+initComplete: function() {
+	// 스크립트
+}

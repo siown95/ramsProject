@@ -1,0 +1,187 @@
+<?php
+$permissionCls = new permissionCmp();
+$infoClassCmp = new infoClassCmp();
+$franchise_info = $infoClassCmp->searchFranchisee(1);
+if (!empty($_SESSION['logged_no_adm'])) {
+    $state = $permissionCls->selectCommuteLog($_SESSION['logged_no_adm'], '1', 'adm');
+    $state = !empty($state) ? $state : '퇴근';
+}
+$state = !empty($state) ? $state : '퇴근';
+?>
+<script>
+    $(document).ready(function() {
+        $('#btnCommute2').click(function() {
+            $('#btnCommute').trigger('click');
+        });
+        <?php if ($_SESSION['logged_id_adm'] == 'admin') { ?>
+            $("#selAdmCenter").change(function() {
+                var targetCenter_idx = $(this).val();
+                if (targetCenter_idx) {
+                    $.ajax({
+                        url: '/adm/ajax/franchiseControll.ajax.php',
+                        dataType: 'JSON',
+                        type: 'POST',
+
+                        data: {
+                            action: 'centerSelect',
+                            franchise_idx: targetCenter_idx
+                        },
+                        success: function(result) {
+                            if (result.success && result.data) {
+                                window.open("/" + result.data.center_eng_name + "/index.php", "_blank", "width=1000, height=800, left=" + Math.ceil((window.screen.width - 700) / 2) + ", top=" + Math.ceil((window.screen.height - 800) / 2));
+                                $("#selAdmCenter").val("").prop("selected", true);
+                                return false;
+                            } else {
+                                alert(result.msg);
+                                return false;
+                            }
+                        },
+                        error: function(request, status, error) {
+                            alert("request : " + request + "\n" + "status : " + status + "\n" + "error : " + error);
+                        }
+                    });
+                }
+
+            });
+        <?php } ?>
+    });
+
+    function commute_check() {
+        var user_no = '<?= $_SESSION['logged_no_adm'] ?>';
+        var state = '<?= ($state == '퇴근') ? "출근" : "퇴근" ?>';
+
+        if (confirm(state + " 체크를 진행하겠습니까?") == true) {
+            $.ajax({
+                url: '/adm/ajax/commuteControll.ajax.php',
+                dataType: 'JSON',
+                type: 'POST',
+
+                data: {
+                    action: 'insertCommuteLog',
+                    user_no: user_no,
+                    state: state
+                },
+                success: function(result) {
+                    if (result.success) {
+                        alert(result.msg);
+                        location.reload();
+                        return false;
+                    } else {
+                        alert(result.msg);
+                        return false;
+                    }
+                },
+                error: function(request, status, error) {
+                    alert("request : " + request + "\n" + "status : " + status + "\n" + "error : " + error);
+                }
+            });
+        }
+    }
+</script>
+<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+    <!-- Navbar Brand-->
+    <a class="navbar-brand ps-3" href="/adm/"><img class="img rounded-circle" src="img/logo.png" alt="logoImage" /><span class="align-middle ms-1">리딩엠</span></a>
+    <!-- Sidebar Toggle-->
+    <button type="button" class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" aria-label="sidebartoggle" href="#!"><i class="fas fa-bars"></i></button>
+    <?php if ($_SESSION['logged_id_adm'] == 'admin') { ?>
+        <form class="d-none d-md-inline-block form-inline ms-2 me-0 me-md-3 my-2 my-md-0">
+            <div class="input-group">
+                <select id="selAdmCenter" class="form-select" aria-label="selAdmCenter">
+                    <option value="">센터선택</option>
+                    <?php
+                    if (!empty($franchise_info)) {
+                        foreach ($franchise_info as $key => $val) {
+                            echo "<option value=\"" . $val['franchise_idx'] . "\">" . $val['center_name'] . "</option>";
+                        }
+                    }
+                    ?>
+                </select>
+            </div>
+        </form>
+    <?php } ?>
+    <!-- Navbar Grid-->
+    <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+        <?php
+        if (!empty($_SESSION['logged_id_adm'])) {
+            $goodsOrderCnt = $infoClassCmp->getGoodsOrder();
+            $goodsOrderClass = "btn-outline-light";
+
+            if ($goodsOrderCnt) {
+                $goodsOrderClass = "btn-danger";
+            }
+        ?>
+            <a class="btn btn-sm <?= $goodsOrderClass ?>" href="/adm/goods_orderlist.php"><i class="fa-solid fa-cart-shopping"></i>주문</a>
+            <?php
+            $activityErrorCnt = $infoClassCmp->getErrorReport();
+            $activityErrorClass = "btn-outline-light";
+
+            if ($activityErrorCnt) {
+                $activityErrorClass = "btn-danger";
+            }
+
+            $inquiryCnt = $infoClassCmp->getInquiryCnt();
+            $inquitClass = "btn-outline-light";
+
+            if ($inquiryCnt) {
+                $inquitClass = "btn-danger";
+            }
+
+            $bookRequestCnt = $infoClassCmp->getBookRequestCnt();
+            $bookRequestClass = "btn-outline-light";
+
+            if ($bookRequestCnt) {
+                $bookRequestClass = "btn-danger";
+            }
+            $refundRequestCnt = $infoClassCmp->getRefundRequestCnt();
+            $refundRequestClass = "btn-outline-light";
+
+            if ($refundRequestCnt) {
+                $refundRequestClass = "btn-danger";
+            }
+            ?>
+            <a class="btn btn-sm <?= $activityErrorClass ?>" href="/adm/activity_error_report.php"><i class="fa-solid fa-circle-exclamation"></i>활동지</a>
+            <a class="btn btn-sm <?= $inquitClass ?>" href="/adm/inquiry_request.html"><i class="fa-solid fa-circle-question"></i>문의요청</a>
+            <a class="btn btn-sm <?= $bookRequestClass ?>" href="/adm/book_request.php"><i class="fa-solid fa-circle-question"></i>도서등록</a>
+            <a class="btn btn-sm <?= $refundRequestClass ?>" href="/adm/refund_list.php"><i class="fa-solid fa-receipt"></i>환불</a>
+            <a class="btn btn-sm btn-outline-light" href="/adm/businessreport.html"><i class="fa-solid fa-clipboard"></i>업무보고</a>
+            <?php
+            if ($_SESSION['logged_id_adm'] == 'admin') {
+            ?>
+                <a class="btn btn-sm btn-outline-light" href="/adm/workcheck.html"><i class="fa-solid fa-clipboard-list"></i>출근부</a>
+            <?php
+            } else {
+            ?>
+                <button id="btnCommute" class="btn btn-sm <?= ($state == "퇴근") ? "btn-outline-warning" : "btn-outline-light" ?>" type="button" onclick="commute_check()">
+                    <i class="fa-solid fa-clipboard-list"></i>상태 : <?= $state ?>
+                </button>
+        <?php }
+        } ?>
+    </div>
+    <!-- 네비바 메뉴-->
+    <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user"></i>
+                <?php if (empty($_SESSION['logged_id_adm'])) { ?>
+                    로그인이 필요합니다.
+                <?php } else {
+                    echo $_SESSION['logged_name_adm'] . "님";
+                } ?>
+                <i class="fas fa-fw"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                <?php if (empty($_SESSION['logged_id_adm'])) { ?>
+                    <li><a class="dropdown-item" href="/adm/login.html">로그인</a></li>
+                <?php } else { ?>
+                    <li><a class="dropdown-item" href="/adm/usersetting.html">설정</a></li>
+                    <li><a id="btnCommute2" class="dropdown-item" href="#">출퇴근</a></li>
+                    <li><a id="btnBusinessReport" class="dropdown-item" href="/adm/businessreport.html">업무보고</a></li>
+                    <li>
+                        <hr class="dropdown-divider" />
+                    </li>
+                    <li><a class="dropdown-item" href="/adm/logout.php">로그아웃</a></li>
+                <?php } ?>
+            </ul>
+        </li>
+    </ul>
+</nav>

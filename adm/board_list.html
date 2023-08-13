@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <?php
+    $stat = "adm";
+    include_once $_SERVER['DOCUMENT_ROOT'] . "/common/common_script.php";
+    include_once $_SERVER['DOCUMENT_ROOT'] . "/common/dbClass.php";
+    $db = new DBCmp();
+
+    include_once $_SERVER['DOCUMENT_ROOT'] . "/common/commonClass.php";
+    $codeInfoCmp = new codeInfoCmp();
+
+    $franchise_data = $codeInfoCmp->getCodeInfo('03'); //센터구분
+    $center_data = $codeInfoCmp->getCodeInfo('20'); //센터직책
+    ?>
+    <script src="/adm/js/board.js?v=<?= date('YmdHis') ?>"></script>
+</head>
+
+<body class="sb-nav-fixed size-14">
+    <!-- header navbar -->
+    <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/adm/navbar.html'; ?>
+    <div id="layoutSidenav">
+        <!-- sidebar -->
+        <?php include_once('sidebar.html'); ?>
+
+        <div id="Maincontent">
+            <main>
+                <div class="container-fluid px-4">
+                    <!-- 콘텐츠 -->
+                    <div class="mt-3">
+                        <h6>공지사항</h6>
+                        <table class="table table-bordered table-hover" id="dataTable">
+                            <thead class="text-center align-middle">
+                                <th width="10%">번호</th>
+                                <th width="10%">센터공개</th>
+                                <th width="10%">대상공개</th>
+                                <th width="50%">제목</th>
+                                <th width="10%">작성일</th>
+                                <th width="10%">첨부파일</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-end">
+                            <button type="button" id="btnAdd" class="btn btn-outline-success"><i class="fa-solid fa-plus me-1"></i>추가</button>
+                        </div>
+                        <div class="modal fade" id="BoardModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-scrollable modal-xl">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="ModalLabel">게시글</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="boardForm">
+                                            <input type="hidden" id="board_idx">
+                                            <div class="form-floating align-items-center mb-2">
+                                                <input type="hidden" id="board_idx" value="">
+                                                <input type="text" id="txtTitle" class="form-control" maxlength="50" placeholder="제목">
+                                                <label for="txtTitle">제목</label>
+                                            </div>
+                                            <div class="input-group mb-2">
+                                                <div class="form-inline me-2">
+                                                    <div class="form-floating">
+                                                        <select id="selOpenFranchiseType" class="form-select">
+                                                            <option value="">전체공개</option>
+                                                            <?php
+                                                            foreach ($franchise_data as $key => $val) {
+                                                                echo "<option value=\"{$val['code_num2']}\">{$val['code_name']}</option>";
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                        <label for="selOpenFranchiseType">센터공개여부</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-inline me-2">
+                                                    <div class="form-floating">
+                                                        <select id="selOpenTargetType" class="form-select">
+                                                            <option value="">전체공개</option>
+                                                            <?php
+                                                            foreach ($center_data as $key => $val) {
+                                                                if ($val['code_num2'] >= '04') {
+                                                                    echo "<option value=\"{$val['code_num2']}\">{$val['code_name']}</option>";
+                                                                }
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                        <label for="selOpenTargetType">대상공개여부</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-inline align-self-center">이미지 첨부 시 클립보드 이미지를 붙여 넣으면 이미지 첨부가 안될 수 있습니다&#46;</div>
+                                            </div>
+                                            <textarea id="summernote" class="form-control" placeholder="내용"></textarea>
+                                            <div class="input-group align-items-center mt-2">
+                                                <div class="form-inline me-2">
+                                                    <input type="text" id="txtImageFileName" class="form-control bg-white" placeholder="파일을 선택해주세요" disabled readonly>
+                                                    <input type="file" id="fileAttach" class="form-control d-none" name="fileAttach">
+                                                </div>
+                                                <div class="form-inline">
+                                                    <button type="button" id="btnImageUpload" class="btn btn-outline-secondary me-2"><i class="fa-solid fa-file-arrow-up me-1"></i>파일선택</button>
+                                                    <a class="link-info me-2 d-none" href="" id="exfile" download><i class="fa-solid fa-file-arrow-down"></i></a>
+                                                    <input type="hidden" id="file_name">
+                                                    <input type="hidden" id="file_path">
+                                                    <a class="btn btn-sm btn-outline-danger d-none" href="javascript:void(0)" id="imgdel"><i class="fa-solid fa-trash me-1"></i>삭제</a>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fa-solid fa-xmark me-1"></i>닫기</button>
+                                        <button type="button" class="btn btn-primary" id="btnSave"><i class="fa-solid fa-floppy-disk me-1"></i>저장</button>
+                                        <button type="button" class="btn btn-danger d-none" id="btnDelete"><i class="fa-solid fa-trash me-1"></i>삭제</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <!-- footer -->
+            <?php
+            include_once('footer.html');
+            ?>
+        </div>
+    </div>
+</body>
+
+</html>

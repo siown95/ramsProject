@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <?php
+    $stat = "adm";
+    include_once $_SERVER['DOCUMENT_ROOT'] . "/common/common_script.php";
+    ?>
+</head>
+
+<body class="sb-nav-fixed size-14">
+    <!-- header navbar -->
+    <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/adm/navbar.html'; ?>
+    <div id="layoutSidenav">
+        <!-- sidebar -->
+        <?php
+        include_once $_SERVER['DOCUMENT_ROOT'] . '/adm/sidebar.html';
+        $analysisClassCmp = new analysisClassCmp();
+        ?>
+        <div id="Maincontent">
+            <main>
+                <div class="container-fluid px-4">
+                    <div class="row mt-3 mb-2">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <?php
+                                    $sales_month = $analysisClassCmp->getMonthSales();
+                                    ?>
+                                    <i class="fa-solid fa-coins"></i> <?=date('m')?>월매출 <span><?= ($sales_month != 0 ? number_format($sales_month) : 0) ?></span> 원
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <?php
+                                    $sales_year = $analysisClassCmp->getYearSales();
+                                    ?>
+                                    <i class="fa-solid fa-money-bill"></i> <?=date('Y')?>년매출 <span><?= ($sales_year != 0 ? number_format($sales_year) : 0) ?></span> 원
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <?php
+                                    $new_Student = $analysisClassCmp->getMonthStudent();
+                                    ?>
+                                    <i class="fa-solid fa-user"></i> 신규학생수 <span><?= number_format($new_Student) ?></span> 명
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <?php
+                                    $total_Student = $analysisClassCmp->getAllStudent();
+                                    ?>
+                                    <i class="fa-solid fa-user"></i> 총재원생수 <span><?= number_format($total_Student) ?></span> 명
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <div class="row align-items-center">
+                                        <div class="col align-items-start align-self-center"><i class="fa-solid fa-credit-card me-1"></i>매출</div>
+                                        <div class="col-auto align-items-end">
+                                            <div class="form-floating">
+                                                <select id="selCenterType1" class="form-select" onchange="getSalesChartData()">
+                                                    <option value="all">전체</option>
+                                                    <option value="01">직영</option>
+                                                    <option value="02">가맹</option>
+                                                </select>
+                                                <label for="selCenterType1">직영가맹</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="card-body chartreport1"><canvas id="BarChart1"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <div class="row align-items-center">
+                                        <div class="col align-items-start align-self-center"><i class="fa-solid fa-user me-1"></i>등록원생 수</div>
+                                        <div class="col-auto align-items-end">
+                                            <div class="form-floating">
+                                                <select class="form-select" id="selCenterType2" onchange="getStudentChartData()">
+                                                    <option value="all">전체</option>
+                                                    <option value="01">직영</option>
+                                                    <option value="02">가맹</option>
+                                                </select>
+                                                <label for="selCenterType2">직영가맹</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body chartreport2"><canvas id="BarChart2"></canvas></div>
+                            </div>
+                        </div>
+                        <script>
+                            $(document).ready(function() {
+                                getSalesChartData();
+                                getStudentChartData();
+                            });
+
+                            function getSalesChartData() {
+                                var center_type = $("#selCenterType1").val();
+
+                                $.ajax({
+                                    url: '/adm/ajax/invoiceControll.ajax.php',
+                                    dataType: 'JSON',
+                                    type: 'POST',
+
+                                    data: {
+                                        action: 'getSalesChartData',
+                                        center_type: center_type
+                                    },
+                                    success: function(data) {
+                                        salesChart(data.data.dataset1, data.data.dataset2);
+                                    },
+                                    error: function(request, status, error) {
+                                        alert("request : " + request + "\n" + "status : " + status + "\n" + "error : " + error);
+                                    }
+                                });
+                            }
+
+                            function salesChart(dataset1, dataset2) {
+                                $("canvas#BarChart1").remove();
+                                $("div.chartreport1").append('<canvas id="BarChart1"></canvas>');
+                                var ctx1 = document.getElementById("BarChart1");
+
+                                var data1 = {
+                                    labels: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                                    datasets: [{
+                                        label: '작년매출',
+                                        backgroundColor: "rgba(133, 235, 0, 0.8)",
+                                        borderColor: "rgba(133, 235, 0, 1)",
+                                        yAxisID: 'y',
+                                        data: dataset1,
+                                    }, {
+                                        label: '올해매출',
+                                        backgroundColor: "rgba(255, 51, 51, 0.85)",
+                                        borderColor: "rgba(255, 51, 51, 1)",
+                                        yAxisID: 'y',
+                                        data: dataset2,
+                                    }],
+                                }
+
+                                var myLineChart = new Chart(ctx1, {
+                                    type: 'bar',
+                                    data: data1,
+                                    options: {
+                                        responsive: true,
+                                        scales: {
+                                            y: {
+                                                position: 'left',
+                                                ticks: {
+                                                    beginAtZero: true,
+                                                    callback: function(value, index, ticks) {
+                                                        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '원';
+                                                    },
+                                                }
+                                            },
+                                        },
+                                        interaction: {
+                                            mode: 'index',
+                                            intersect: false,
+                                        },
+                                    },
+                                });
+                            }
+
+                            function getStudentChartData() {
+                                var center_type = $("#selCenterType2").val();
+
+                                $.ajax({
+                                    url: '/adm/ajax/studentControll.ajax.php',
+                                    dataType: 'JSON',
+                                    type: 'POST',
+
+                                    data: {
+                                        action: 'getStudentData',
+                                        center_type: center_type
+                                    },
+                                    success: function(data) {
+                                        studentChart(data.data.dataset1, data.data.dataset2);
+                                    },
+                                    error: function(request, status, error) {
+                                        alert("request : " + request + "\n" + "status : " + status + "\n" + "error : " + error);
+                                    }
+                                });
+                            }
+
+                            function studentChart(dataset1, dataset2) {
+                                $("canvas#BarChart2").remove();
+                                $("div.chartreport2").append('<canvas id="BarChart2"></canvas>');
+                                var ctx2 = document.getElementById("BarChart2");
+
+                                var data2 = {
+                                    labels: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+                                    datasets: [{
+                                        label: '작년등록학생수',
+                                        backgroundColor: "rgba(133, 235, 0, 0.8)",
+                                        borderColor: "rgba(133, 235, 0, 1)",
+                                        yAxisID: 'y',
+                                        data: dataset1,
+                                    }, {
+                                        label: '올해등록학생수',
+                                        backgroundColor: "rgba(255, 51, 51, 0.85)",
+                                        borderColor: "rgba(255, 51, 51, 1)",
+                                        yAxisID: 'y',
+                                        data: dataset2,
+                                    }],
+                                }
+
+                                var myPieChart = new Chart(ctx2, {
+                                    type: 'bar',
+                                    data: data2,
+                                    options: {
+                                        responsive: true,
+                                        scales: {
+                                            y: {
+                                                position: 'left',
+                                                ticks: {
+                                                    stepSize: 1,
+                                                    beginAtZero: true,
+                                                    callback: function(value, index, ticks) {
+                                                        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '명';
+                                                    },
+                                                }
+                                            },
+                                        },
+                                        interaction: {
+                                            mode: 'index',
+                                            intersect: false,
+                                        },
+                                    },
+                                });
+                            }
+                        </script>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6>공지사항</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered table-hover" id="noticeTable">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th width="10%" class="text-center">번호</th>
+                                        <th width="70%">글제목</th>
+                                        <th width="20%" class="text-center">작성일</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="noticeList">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <?php include $_SERVER['DOCUMENT_ROOT'] . '/adm/footer.html' ?>
+
+        </div>
+    </div>
+</body>
+<script>
+    $(document).ready(function() {
+        loadBoardMain();
+
+        $("#noticeTable").click(function() {
+            location.href = 'board_list.html';
+        });
+    });
+
+    function loadBoardMain() {
+        $.ajax({
+            url: '/adm/ajax/boardControll.ajax.php',
+            dataType: 'JSON',
+            type: 'POST',
+
+            data: {
+                action: 'loadBoardMain'
+            },
+            success: function(result) {
+                if (result.success) {
+                    $("#noticeList").html(result.data.tbl);
+                }
+            },
+            error: function(request, status, error) {
+                alert("request : " + request + "\n" + "status : " + status + "\n" + "error : " + error);
+            }
+        });
+    }
+</script>
+
+</html>
